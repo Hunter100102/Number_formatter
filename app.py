@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, send_from_directory
 import pandas as pd
 import os
 import re
@@ -7,23 +7,37 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# Route to serve favicon from root directory
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, ''),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+# Updated HTML template with favicon and footer
 HTML_TEMPLATE = """
 <!doctype html>
-<title>Part Number Formatter</title>
-<h2>Upload a .xlsx file with Part Numbers</h2>
-<form method=post enctype=multipart/form-data>
-  <input type=file name=file>
-  <input type=submit value=Upload>
-</form>
-{% if processed %}
-<h3>Formatted Part Numbers (no spaces):</h3>
-<textarea rows="20" cols="80">{{ processed }}</textarea>
-{% endif %}
+<html>
+<head>
+  <title>Part Number Formatter</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <h2>Upload a .xlsx file with Part Numbers</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" value="Upload">
+  </form>
+  {% if processed %}
+    <h3>Formatted Part Numbers (no spaces):</h3>
+    <textarea rows="20" cols="80">{{ processed }}</textarea>
+  {% endif %}
+  <footer style="margin-top:40px; font-size:0.9em; color:#666;">
+    <hr>
+    <p style="text-align:center;">Powered by AutomateIT</p>
+  </footer>
+</body>
+</html>
 """
-
-
-
-
 
 def process_part_number(part):
     # Remove all non-alphanumeric characters and normalize
@@ -51,8 +65,6 @@ def process_part_number(part):
     else:
         return cleaned
 
-
-
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     processed = None
@@ -72,6 +84,5 @@ def upload_file():
     return render_template_string(HTML_TEMPLATE, processed=processed)
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
