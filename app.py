@@ -24,7 +24,9 @@ HTML_TEMPLATE = """
 
 
 
+
 def process_part_number(part):
+    # Remove all non-alphanumeric characters and normalize
     cleaned = re.sub(r'[^A-Za-z0-9]', '', part).upper()
 
     if not cleaned.startswith('A'):
@@ -36,9 +38,16 @@ def process_part_number(part):
         return f"A{digits}*"
     elif len(digits) == 12:
         return f"A{digits[:10]}*"
-    elif len(digits) >= 13:
-        # Replace 11th and 12th characters with '**', preserve the rest
-        return f"A{digits[:10]}**{digits[12:]}"
+    elif len(digits) == 14:
+        # Remove last 4 digits, add '**', then reattach the 4 digits
+        base = digits[:10]
+        suffix = digits[-4:]
+        return f"A{base}**{suffix}"
+    elif len(digits) == 16:
+        # Replace digits at index 10 and 11 with '**'
+        base = digits[:10]
+        suffix = digits[12:]
+        return f"A{base}**{suffix}"
     else:
         return cleaned
 
