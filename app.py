@@ -60,6 +60,8 @@ def process_part_number(part):
         base = digits[:10]
         suffix = digits[12:]
         return f"A{base}**{suffix}"
+    elif len(digits) >= 17:
+        return f"A{digits}"  
     else:
         return cleaned
 
