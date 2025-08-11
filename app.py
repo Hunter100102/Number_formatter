@@ -3,15 +3,15 @@ import pandas as pd
 import os
 import re
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='.')
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Route to serve favicon from root directory
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, ''),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(app.static_folder, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Updated HTML template with favicon and footer
 HTML_TEMPLATE = """
@@ -53,12 +53,10 @@ def process_part_number(part):
     elif len(digits) == 12:
         return f"A{digits[:10]}*"
     elif len(digits) == 14:
-        # Remove last 4 digits, add '**', then reattach the 4 digits
         base = digits[:10]
         suffix = digits[-4:]
         return f"A{base}**{suffix}"
     elif len(digits) == 16:
-        # Replace digits at index 10 and 11 with '**'
         base = digits[:10]
         suffix = digits[12:]
         return f"A{base}**{suffix}"
