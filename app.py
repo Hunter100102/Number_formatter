@@ -9,18 +9,17 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 HTML_TEMPLATE = """
 <!doctype html>
-<title>Part Number Processor</title>
-<h2>Upload a .xlsx or .csv file with Part Numbers</h2>
+<title>Part Number Formatter</title>
+<h2>Upload a .xlsx file with Part Numbers</h2>
 <form method=post enctype=multipart/form-data>
   <input type=file name=file>
   <input type=submit value=Upload>
 </form>
 {% if processed %}
-<h3>Processed Part Numbers:</h3>
+<h3>Formatted Part Numbers (no spaces):</h3>
 <textarea rows="20" cols="80">{{ processed }}</textarea>
 {% endif %}
 """
-
 
 def process_part_number(part):
     # Remove all non-alphanumeric characters and normalize
@@ -40,8 +39,7 @@ def process_part_number(part):
     elif len(digits) == 16:
         return f"A{digits[:10]}**{digits[14:]}"
     else:
-        return part  
-
+        return cleaned  # Return cleaned if it doesn't match expected lengths
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -51,12 +49,10 @@ def upload_file():
         if file:
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filepath)
-            if file.filename.endswith('.xlsx'):
+            try:
                 df = pd.read_excel(filepath, engine='openpyxl')
-            elif file.filename.endswith('.csv'):
-                df = pd.read_csv(filepath)
-            else:
-                return render_template_string(HTML_TEMPLATE, processed="Unsupported file format.")
+            except Exception as e:
+                return render_template_string(HTML_TEMPLATE, processed=f"Error reading file: {e}")
             if 'Part Number' not in df.columns:
                 return render_template_string(HTML_TEMPLATE, processed="Column 'Part Number' not found.")
             processed_parts = [process_part_number(str(p)) for p in df['Part Number']]
@@ -64,6 +60,6 @@ def upload_file():
     return render_template_string(HTML_TEMPLATE, processed=processed)
 
 if __name__ == '__main__':
+    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
