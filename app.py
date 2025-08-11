@@ -23,8 +23,8 @@ HTML_TEMPLATE = """
 
 
 
+
 def process_part_number(part):
-    import re
     cleaned = re.sub(r'[^A-Za-z0-9]', '', part).upper()
 
     if not cleaned.startswith('A'):
@@ -36,15 +36,12 @@ def process_part_number(part):
         return f"A{digits}*"
     elif len(digits) == 12:
         return f"A{digits[:10]}*"
-    elif len(digits) == 14:
-        return f"A{digits[:10]}**{digits[12:]}"
-    elif len(digits) == 16:
-        return f"A{digits[:10]}**{digits[12:]}"  # This line is correct for numeric suffixes
-    elif len(digits) > 12:
-        # General fallback for suffixes beyond 12 digits
+    elif len(digits) >= 13:
+        # Replace 11th and 12th characters with '**', preserve the rest
         return f"A{digits[:10]}**{digits[12:]}"
     else:
         return cleaned
+
 
 
 @app.route('/', methods=['GET', 'POST'])
