@@ -20,19 +20,27 @@ HTML_TEMPLATE = """
 {% endif %}
 """
 
+
 def process_part_number(part):
-    digits = ''.join(filter(str.isdigit, part))
-    prefix = 'A'
+    # Remove all non-alphanumeric characters and normalize
+    cleaned = re.sub(r'[^A-Za-z0-9]', '', part).upper()
+
+    if not cleaned.startswith('A'):
+        return part  # Return original if it doesn't start with 'A'
+
+    digits = cleaned[1:]
+
     if len(digits) == 10:
-        return f"{prefix} {digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:]} *"
+        return f"A{digits}*"
     elif len(digits) == 12:
-        return f"{prefix} {digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:10]} *"
+        return f"A{digits[:10]}*"
     elif len(digits) == 14:
-        return f"{prefix} {digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:10]} ** {digits[12:]}"
+        return f"A{digits[:10]}**{digits[12:]}"
     elif len(digits) == 16:
-        return f"{prefix} {digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:10]} ** {digits[14:]}"
+        return f"A{digits[:10]}**{digits[14:]}"
     else:
-        return part
+        return part  
+
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
