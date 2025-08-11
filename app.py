@@ -21,6 +21,7 @@ HTML_TEMPLATE = """
 {% endif %}
 """
 
+
 def process_part_number(part):
     # Remove all non-alphanumeric characters and normalize
     cleaned = re.sub(r'[^A-Za-z0-9]', '', part).upper()
@@ -37,7 +38,7 @@ def process_part_number(part):
     elif len(digits) == 14:
         return f"A{digits[:10]}**{digits[12:]}"
     elif len(digits) == 16:
-        return f"A{digits[:10]}**{digits[14:]}"
+        return f"A{digits[:10]}**{digits[10:]}"  # Preserve full suffix
     else:
         return cleaned  # Return cleaned if it doesn't match expected lengths
 
