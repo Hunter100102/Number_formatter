@@ -79,7 +79,7 @@ def upload_file():
                 return render_template_string(HTML_TEMPLATE, processed=f"Error reading file: {e}")
             if 'Part Number' not in df.columns:
                 return render_template_string(HTML_TEMPLATE, processed="Column 'Part Number' not found.")
-            processed_parts = [process_part_number(str(p)) for p in df['Part Number']]
+            processed_parts = list(set(process_part_number(str(p)) for p in df['Part Number']))
             processed = '\n'.join(processed_parts)
     return render_template_string(HTML_TEMPLATE, processed=processed)
 
