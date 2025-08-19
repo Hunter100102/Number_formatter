@@ -22,7 +22,7 @@ HTML_TEMPLATE = """
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <h2>Upload a .xlsx file with Part Numbers</h2>
+  <h2>Upload a .xlsx file with Part Numbers -- In this case a properly formatted part number will be output</h2>
   <form method="post" enctype="multipart/form-data">
     <input type="file" name="file">
     <input type="submit" value="Upload">
