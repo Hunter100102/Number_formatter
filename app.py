@@ -19,6 +19,11 @@ HTML_TEMPLATE = """
 <!doctype html>
 <html>
 <head>
+    <!-- Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-ZJ9F6BZ2N2"
+    ></script>
   <meta charset="utf-8">
   <title>Part Number Formatter</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
